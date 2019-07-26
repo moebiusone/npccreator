@@ -1,4 +1,4 @@
-import { rollDie } from './Dice';
+import { rollDie } from '../utils/Dice';
 
 export class Origins {
 

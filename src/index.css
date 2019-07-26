@@ -40,7 +40,7 @@ body {
 }
 
 .right {
-  width: 50%;
+  flex-grow: 1;
 }
 
 .traits-box {

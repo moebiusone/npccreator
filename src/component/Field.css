@@ -1,0 +1,11 @@
+#field {
+    width: 100%;
+}
+
+.field-label {
+    width: 35%;
+}
+
+.field-value {
+    width: 60%;
+}

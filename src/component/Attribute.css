@@ -1,0 +1,16 @@
+.attribute {
+    margin: 2px;
+    padding: 2px;
+    border: 1px solid #bbb;
+    background-color: #eee;
+    font-size: 1.2em;
+  }
+  
+  .attribute span {
+    text-decoration: none;
+    color: #333;
+  }
+
+  .rightside{
+    text-align: right;
+  }
