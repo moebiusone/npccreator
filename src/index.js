@@ -142,6 +142,7 @@ class DieRollerForm extends Component {
 		console.log(`profession traits = ${professionTraits}`);
 		let fullTraits = Array.prototype.concat(backgroundTraits, professionTraits);
 		fullTraits.sort(this.compareTraits);
+		
 		await this.setState ({ traits : fullTraits});
 	};
 
