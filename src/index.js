@@ -3,16 +3,19 @@ import { render } from 'react-dom';
 import { roll8Plus2d3 } from './utils/Dice';
 import { Origins } from './data/Origins';
 import { Backgrounds } from './data/Backgrounds';
+import './data/Professions';
 import './index.css';
 import TraitList from "./component/TraitList";
 import AttributeList from './component/AttributeList';
 import Field from './component/Field';
+import Professions from './data/Professions';
 
 class DieRollerForm extends Component {
 	constructor(props) {
 		super(props);
 		this.origins = new Origins();
 		this.backgrounds = new Backgrounds();
+		this.professions = new Professions();
 		this.state = {
 			name: "Nameless",
 			level: 1,
@@ -73,6 +76,24 @@ class DieRollerForm extends Component {
 		}
 	}
 
+	compareTraits(a,b) {
+		var traitNameA = a.name;
+		if (typeof traitNameA === 'string') {
+			traitNameA = traitNameA.toUpperCase();
+		}
+		var traitNameB = b.name;
+		if (typeof traitNameB === 'string') {
+			traitNameB = traitNameB.toUpperCase();
+		}
+		let comparison = 0;
+		if (traitNameA > traitNameB) {
+			comparison = 1;
+		} else if (traitNameA < traitNameB) {
+			comparison = -1;
+		}
+		return comparison;
+	}
+
 	async doReroll() {
 		await this.setState({ accuracy: roll8Plus2d3() });
 		console.log(`Accuracy = ${this.state.accuracy}`);
@@ -102,9 +123,8 @@ class DieRollerForm extends Component {
 		let myBackground = this.backgrounds.pickBackground();
 		console.log(`background = ${myBackground.getBackgroundName()}`);
 		await this.setState({ background: myBackground.getBackgroundName() });
-		let selectedTraits = this.backgrounds.pickTraits(myBackground);
-		console.log(`background traits = ${selectedTraits}`);
-		await this.setState ({ traits : selectedTraits});
+		let backgroundTraits = this.backgrounds.pickTraits(myBackground);
+		console.log(`background traits = ${backgroundTraits}`);
 		let tempAttributes = [];
 		tempAttributes.push({ name : "Accuracy", value : this.state.accuracy});
 		tempAttributes.push({ name : "Athletics", value : this.state.athletics});
@@ -115,6 +135,14 @@ class DieRollerForm extends Component {
 		tempAttributes.push({ name : "Toughness", value : this.state.toughness});
 		await this.setState ({ attributes : tempAttributes});
 		await this.setState({ currentHP: this.state.toughness });
+		var randomProfession = this.professions.pickProfession();
+		console.log(`profession = ${JSON.stringify(randomProfession)}`);
+		await this.setState({ profession : randomProfession.name });
+		let professionTraits = this.professions.pickTraits(randomProfession, backgroundTraits);
+		console.log(`profession traits = ${professionTraits}`);
+		let fullTraits = Array.prototype.concat(backgroundTraits, professionTraits);
+		fullTraits.sort(this.compareTraits);
+		await this.setState ({ traits : fullTraits});
 	};
 
 	clickReroll(el){
@@ -138,6 +166,7 @@ class DieRollerForm extends Component {
 						<Field label="Career Path:" value={this.state.profession}/>
 						<Field label="Level:" value={this.state.level}/>
 					</div> 
+					<div><hr className="theline"/></div>
 					<div className="row">
 						<div className="left">
 							<h3>Attributes (2d3+8)</h3>
@@ -148,15 +177,13 @@ class DieRollerForm extends Component {
 							<TraitList traits={this.state.traits} />
 						</div>
 					</div> 
-					<div className="row">
-						<Field/>
+					<div><hr className="theline"/></div>
+					<div className="centered">
 						<Field label="Current HP:" value={this.state.currentHP}/>
-					</div> 
-					<div className="row">
-						<Field/>
 						<Field label="Current Morale:" value={this.state.currentMorale}/>
 					</div> 
-					<button id="rollNPCbutton" onClick={this.doReroll} ref={this.clickReroll}>Roll NPC</button>
+					<div><hr className="theline"/></div>
+					<button className="button" id="rollNPCbutton" onClick={this.doReroll} ref={this.clickReroll}>Roll NPC</button>
 				</div>
 			</div>
 		);

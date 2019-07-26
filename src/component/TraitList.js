@@ -4,7 +4,7 @@ import { Trait } from "./Trait";
 export function TraitList(props) {
   return (
     <div>
-        {props.traits.map(c => <Trait key={c} name={c} />)}
+        {props.traits.map(c => <Trait key={c} name={c}/>)}
     </div>
   );
 }
