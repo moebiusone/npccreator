@@ -1,0 +1,12 @@
+.trait {
+    margin: 2px;
+    padding: 2px;
+    border: 1px solid #bbb;
+    background-color: #eee;
+  }
+  
+  .trait span {
+    font-size: 1.2em;
+    text-decoration: none;
+    color: #333;
+  }
