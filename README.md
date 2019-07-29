@@ -21,4 +21,4 @@ The following code, when run via `npm start`, should open a web page that enable
 
 ## Preview
 
-![Screen Shot as of July 26, 2019](/public/npc-creator-26-JUL-2019.jpg)
+![Screen Shot as of July 29, 2019](/public/npc-creator-29-JUL-2019.jpg)
