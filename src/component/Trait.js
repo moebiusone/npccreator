@@ -1,7 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
 import "./Trait.css";
-import { Traits } from "../data/Traits";
+
+const Traits = require('../data/Traits');
 
 export function Trait(props) {
     var traits = new Traits();

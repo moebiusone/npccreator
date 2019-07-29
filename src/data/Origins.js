@@ -1,6 +1,6 @@
-import { rollDie } from '../utils/Dice';
+const rollDie = require('../utils/Dice').rollDie;
 
-export class Origins {
+class Origins {
 
     constructor() {
         this.origins = [];
@@ -29,3 +29,5 @@ export class Origins {
         return this.origins[randomOrigin - 1];
     }
 }
+
+module.exports = Origins;

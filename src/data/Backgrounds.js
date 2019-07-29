@@ -1,38 +1,8 @@
-import { rollDie } from '../utils/Dice';
-import './Traits';
-import Traits from './Traits';
+const rollDie = require('../utils/Dice').rollDie;
+const Traits = require('./Traits');
+var Background = require ('./Background');
 
-export class Background {
-    constructor(name, values, toChoose, attribute) {
-        this.backgroundName = name;
-        this.traits = [];
-        this.addTraits(values);
-        this.numberToChoose = toChoose;
-        this.attribute = attribute;
-    }
-
-    addTraits(values) {
-        this.traits = values;
-    }
-
-    getBackgroundName() {
-        return this.backgroundName;
-    }
-
-    getTraits() {
-        return this.traits;
-    }
-
-    getNumberToChoose() {
-        return this.numberToChoose;
-    }
-
-    getAttributeToKnock() {
-        return this.attribute;
-    }
-}
-
-export class Backgrounds {
+class Backgrounds {
 
     constructor() {
         this.backgrounds = [];
@@ -84,3 +54,5 @@ export class Backgrounds {
         console.log(JSON.stringify(traitRaw));
     }
 }
+
+module.exports = Backgrounds;

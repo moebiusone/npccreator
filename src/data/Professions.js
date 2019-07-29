@@ -1,7 +1,7 @@
-import { rollDie } from '../utils/Dice';
-import { Traits } from './Traits';
+const rollDie = require('../utils/Dice').rollDie;
+const Traits = require('./Traits');
 
-export class Professions {
+class Professions {
 
     constructor() {
         this.professions = [];
@@ -72,4 +72,4 @@ export class Professions {
     }    
 }
 
-export default Professions;
+module.exports = Professions;

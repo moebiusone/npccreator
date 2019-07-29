@@ -1,4 +1,6 @@
-export class Traits {
+const rollDie = require('../utils/Dice').rollDie;
+
+class Traits {
 
     constructor() {
         this.traits = [];
@@ -66,6 +68,9 @@ export class Traits {
         this.traits.push(this.createTrait('Surgery', 'Accuracy', ['Bandages', 'Medicine']));
         this.traits.push(this.createTrait('Tactics', 'Education'));
         this.traits.push(this.createTrait('Xenobiology', 'Education', ['Biology']));
+
+        this.special = [];
+        this.special.push('Rich');
     }
 
     createTrait(name, attribute, prerequisites = [], attributesToMod = [], allPrereqs = true ) {
@@ -100,6 +105,53 @@ export class Traits {
             return {};
         }
     }
+
+    async hasPrerequisites(trait, currentList) {
+        if (trait) {
+            var prereqs = trait.prerequisites;
+            // if the trait has no prereqs, we're golden
+            if (prereqs === undefined || prereqs.length === 0) {
+                return true;
+            }
+            // if the trait has prereqs, but the character doesn't have any traits, we can't proceed
+            if (currentList === undefined || currentList.length === 0) {
+                return false;
+            }
+            // if the character already has the trait, we can't proceed
+            if (currentList.includes(trait.name)) {
+                return false;
+            }
+            var allPrereqFlag = trait.allPrerequisites;
+            var foundPrereqs = [];
+            for (var i = 0; i < prereqs.length; i++) {
+                var prereq = prereqs[i];
+                if (currentList.includes(prereq)) {
+                    foundPrereqs.push(prereq);
+                }
+            }
+            console.log(`--Trait ${trait.name} has prereqs ${prereqs}`);
+            if (foundPrereqs.length === 1 && !allPrereqFlag) {
+                console.log(`--Trait needs one prereq from ${prereqs} and has ${foundPrereqs}`);
+                return true;
+            }
+            if (foundPrereqs.length === prereqs.length) {
+                console.log(`--Trait needs all prereqs from ${prereqs} and has ${foundPrereqs}`);
+                return true;
+            }
+        }
+        console.log(`--Trait ${trait.name} does not have necessary prereqs ${prereqs} in trait list ${currentList}`);
+        return false;
+    }
+
+    pickTrait() {
+        let size = this.traits.length;
+        let randomTrait = rollDie(size);
+        while (this.special.includes(this.traits[randomTrait-1].name)) {
+            randomTrait = rollDie(size);
+        }
+        return this.traits[randomTrait - 1];
+    }
+
 }
 
-export default Traits;
+module.exports = Traits

@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
-import { roll8Plus2d3 } from './utils/Dice';
-import { Origins } from './data/Origins';
-import { Backgrounds } from './data/Backgrounds';
-import './data/Professions';
 import './index.css';
 import TraitList from "./component/TraitList";
 import AttributeList from './component/AttributeList';
 import Field from './component/Field';
-import Professions from './data/Professions';
+
+const roll8Plus2d3 = require('./utils/Dice').roll8Plus2d3;
+const Origins = require('./data/Origins');
+const Backgrounds = require('./data/Backgrounds');
+const Professions = require('./data/Professions');
+const Traits = require('./data/Traits');
 
 class DieRollerForm extends Component {
 	constructor(props) {
@@ -16,6 +17,7 @@ class DieRollerForm extends Component {
 		this.origins = new Origins();
 		this.backgrounds = new Backgrounds();
 		this.professions = new Professions();
+		this.traits = new Traits();
 		this.state = {
 			name: "Nameless",
 			level: 1,
@@ -38,6 +40,7 @@ class DieRollerForm extends Component {
 		}
 		
 		this.doReroll = this.doReroll.bind(this);
+		this.addLevel = this.addLevel.bind(this);
 	}
 
 	async setAttributeValue(attribute, value) {
@@ -94,9 +97,35 @@ class DieRollerForm extends Component {
 		return comparison;
 	}
 
+	async addLevel() {
+		var currentLevel = this.state.level;
+		var newLevel = currentLevel + 1;
+		await this.setState({level: newLevel});
+		console.log(`New Level = ${this.state.level}`);
+
+		var currentTraits = this.state.traits;
+		var newTrait = await this.traits.pickTrait();
+		console.log(`new trait for level ${this.state.level} = ${JSON.stringify(newTrait)}`);
+		var alreadyHasTrait = currentTraits.includes(newTrait.name);
+		var hasPrereqsForTrait = await this.traits.hasPrerequisites(newTrait, currentTraits);
+		console.log(`Already has trait ${newTrait.name} = ${alreadyHasTrait}`);
+		console.log(`Has prereqs for trait ${newTrait.name} = ${hasPrereqsForTrait}`);
+		while (alreadyHasTrait || !hasPrereqsForTrait) {
+			newTrait = await this.traits.pickTrait();
+			alreadyHasTrait = currentTraits.includes(newTrait.name);
+			hasPrereqsForTrait = await this.traits.hasPrerequisites(newTrait, currentTraits);
+			console.log(`picked another new trait = ${JSON.stringify(newTrait)}`);
+			console.log(`Already has trait ${newTrait.name} = ${alreadyHasTrait}`);
+			console.log(`Has prereqs for trait ${newTrait.name} = ${hasPrereqsForTrait}`);
+		}
+		currentTraits.push(newTrait.name);
+		await this.setState ({ traits : currentTraits});
+	}
+
 	async doReroll() {
+		await this.setState({ level: 1 });
 		await this.setState({ accuracy: roll8Plus2d3() });
-		console.log(`Accuracy = ${this.state.accuracy}`);
+		console.log(`accuracy = ${this.state.accuracy}`);
 		await this.setState({ athletics: roll8Plus2d3() });
 		console.log(`athletics = ${this.state.athletics}`);
 		await this.setState({ awareness: roll8Plus2d3() });
@@ -185,6 +214,7 @@ class DieRollerForm extends Component {
 					</div> 
 					<div><hr className="theline"/></div>
 					<button className="button" id="rollNPCbutton" onClick={this.doReroll} ref={this.clickReroll}>Roll NPC</button>
+					<button className="button" id="addLevelButton" onClick={this.addLevel}>Add Level</button>
 				</div>
 			</div>
 		);
