@@ -11,13 +11,13 @@ The following code, when run via `npm start`, should open a web page that enable
 * Randomly selects Background and selects trait
 * Randomly selects Career Path (Profession) and selects trait
 * Orders trait list and lists applicable attribute for each
+* Add level up option which selects a random trait, looks at prerequisites, and handles the heavy lifting
 
 ## What remains
 
 * Some traits are "special" like Cybernetic or Genetic Modifications, granting attribute bonuses to a single attribute - need to process these when selected, randomly choose attribute, update it, and note which attribute was chosen for the trait
 * "Pretty up" the character sheet through better CSS
 * Add random name generator and create an applicable character name
-* Add level up option which selects a random trait, looks at prerequisites, and handles the heavy lifting 
 
 ## Preview
 
