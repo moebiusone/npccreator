@@ -11,6 +11,7 @@ const Origins = require('./data/Origins');
 const Backgrounds = require('./data/Backgrounds');
 const Professions = require('./data/Professions');
 const Traits = require('./data/Traits');
+const Names = require('./data/Names');
 
 class DieRollerForm extends Component {
 	constructor(props) {
@@ -19,6 +20,7 @@ class DieRollerForm extends Component {
 		this.backgrounds = new Backgrounds();
 		this.professions = new Professions();
 		this.traits = new Traits();
+		this.names = new Names();
 		this.state = {
 			name: "Nameless",
 			level: 1,
@@ -162,6 +164,8 @@ class DieRollerForm extends Component {
 	}
 
 	async doReroll() {
+		let randomName = this.names.pickName();
+		await this.setState({ name: randomName})
 		await this.setState({ level: 1 });
 		await this.setState({ accuracy: roll8Plus2d3() });
 		console.log(`accuracy = ${this.state.accuracy}`);
