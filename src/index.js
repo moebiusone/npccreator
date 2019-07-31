@@ -6,6 +6,7 @@ import AttributeList from './component/AttributeList';
 import Field from './component/Field';
 
 const roll8Plus2d3 = require('./utils/Dice').roll8Plus2d3;
+const rollDie = require('./utils/Dice').rollDie;
 const Origins = require('./data/Origins');
 const Backgrounds = require('./data/Backgrounds');
 const Professions = require('./data/Professions');
@@ -107,19 +108,57 @@ class DieRollerForm extends Component {
 		var newTrait = await this.traits.pickTrait();
 		console.log(`new trait for level ${this.state.level} = ${JSON.stringify(newTrait)}`);
 		var alreadyHasTrait = currentTraits.includes(newTrait.name);
+		var traitIsOkToRepeat = this.traits.canRepeatTraits.includes(newTrait.name);
 		var hasPrereqsForTrait = await this.traits.hasPrerequisites(newTrait, currentTraits);
 		console.log(`Already has trait ${newTrait.name} = ${alreadyHasTrait}`);
 		console.log(`Has prereqs for trait ${newTrait.name} = ${hasPrereqsForTrait}`);
-		while (alreadyHasTrait || !hasPrereqsForTrait) {
+		while (alreadyHasTrait && !traitIsOkToRepeat || !hasPrereqsForTrait) {
 			newTrait = await this.traits.pickTrait();
 			alreadyHasTrait = currentTraits.includes(newTrait.name);
+			traitIsOkToRepeat = this.traits.canRepeatTraits.includes(newTrait.name);
 			hasPrereqsForTrait = await this.traits.hasPrerequisites(newTrait, currentTraits);
 			console.log(`picked another new trait = ${JSON.stringify(newTrait)}`);
 			console.log(`Already has trait ${newTrait.name} = ${alreadyHasTrait}`);
 			console.log(`Has prereqs for trait ${newTrait.name} = ${hasPrereqsForTrait}`);
 		}
-		currentTraits.push(newTrait.name);
+
+		var newTraitName = newTrait.name;
+		var att2Mod = null;
+		if (newTrait.attributesToMod && newTrait.attributesToMod.length > 0) {
+			var goingToMaxAttribute = true;
+			var attValue = null;
+			var newAttValue = null;
+			while (goingToMaxAttribute) {
+				var dieRoll = rollDie(newTrait.attributesToMod.length) - 1;
+				att2Mod = newTrait.attributesToMod[dieRoll].toLowerCase();
+				attValue = this.getAttributeValue(att2Mod);
+				newAttValue = attValue + 1;
+				if (newAttValue <= 16) {
+					goingToMaxAttribute = false;
+				}
+			}
+			console.log(`bumping origin attribute ${att2Mod} from ${attValue} to ${newAttValue}`);
+			await this.setAttributeValue(att2Mod, newAttValue);
+			let recheckAttrValue = this.getAttributeValue(att2Mod);
+			console.log(`make sure it changed ${att2Mod} to ${attValue} to ${recheckAttrValue}`);
+			newTraitName = `${newTrait.name}{${att2Mod}}`;
+		}
+
+		currentTraits.push(newTraitName);
+		currentTraits.sort(this.compareTraits);
 		await this.setState ({ traits : currentTraits});
+
+		let tempAttributes = [];
+		tempAttributes.push({ name : "Accuracy", value : this.state.accuracy});
+		tempAttributes.push({ name : "Athletics", value : this.state.athletics});
+		tempAttributes.push({ name : "Awareness", value : this.state.awareness});
+		tempAttributes.push({ name : "Education", value : this.state.education});
+		tempAttributes.push({ name : "Morale", value : this.state.morale});
+		tempAttributes.push({ name : "Presence", value : this.state.presence});
+		tempAttributes.push({ name : "Toughness", value : this.state.toughness});
+		await this.setState ({ attributes : tempAttributes});
+		await this.setState({ currentHP: this.state.toughness });
+
 	}
 
 	async doReroll() {
@@ -154,6 +193,27 @@ class DieRollerForm extends Component {
 		await this.setState({ background: myBackground.getBackgroundName() });
 		let backgroundTraits = this.backgrounds.pickTraits(myBackground);
 		console.log(`background traits = ${backgroundTraits}`);
+		var randomProfession = this.professions.pickProfession();
+		console.log(`profession = ${JSON.stringify(randomProfession)}`);
+		await this.setState({ profession : randomProfession.name });
+		let professionTraits = this.professions.pickTraits(randomProfession, backgroundTraits);
+		console.log(`profession traits = ${professionTraits}`);
+		let fullTraits = Array.prototype.concat(backgroundTraits, professionTraits);
+
+		for (var i = 0; i < fullTraits.length; i++) {
+			var traitName = fullTraits[i];
+			var theTrait = this.traits.getTrait(traitName);
+			if (theTrait.attributesToMod && theTrait.attributesToMod.length > 0) {
+				var att2Mod = theTrait.attributesToMod[rollDie(theTrait.attributesToMod.length - 1)].toLowerCase();
+				let attValue = this.getAttributeValue(att2Mod);
+				let newAttValue = attValue + 1;
+				await this.setAttributeValue(att2Mod, newAttValue);
+				fullTraits[i] = `${fullTraits[i]}{${att2Mod}}`;
+			}
+		}
+		fullTraits.sort(this.compareTraits);
+		await this.setState ({ traits : fullTraits});
+
 		let tempAttributes = [];
 		tempAttributes.push({ name : "Accuracy", value : this.state.accuracy});
 		tempAttributes.push({ name : "Athletics", value : this.state.athletics});
@@ -164,15 +224,6 @@ class DieRollerForm extends Component {
 		tempAttributes.push({ name : "Toughness", value : this.state.toughness});
 		await this.setState ({ attributes : tempAttributes});
 		await this.setState({ currentHP: this.state.toughness });
-		var randomProfession = this.professions.pickProfession();
-		console.log(`profession = ${JSON.stringify(randomProfession)}`);
-		await this.setState({ profession : randomProfession.name });
-		let professionTraits = this.professions.pickTraits(randomProfession, backgroundTraits);
-		console.log(`profession traits = ${professionTraits}`);
-		let fullTraits = Array.prototype.concat(backgroundTraits, professionTraits);
-		fullTraits.sort(this.compareTraits);
-		
-		await this.setState ({ traits : fullTraits});
 	};
 
 	clickReroll(el){

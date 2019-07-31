@@ -4,15 +4,29 @@ import "./Trait.css";
 
 const Traits = require('../data/Traits');
 
+function jsUcfirst(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 export function Trait(props) {
     var traits = new Traits();
+    var name = props.name;
     var attr = '';
-    if (props.name) {
-      attr = traits.getTrait(props.name).attribute;
+
+    if (name) {
+      if (name.match(/{(.*)}/) !== null) {
+        attr = name.match(/{(.*)}/)[0];
+        attr = attr.replace('{', '');
+        attr = attr.replace('}', '');
+        attr = jsUcfirst(attr);
+        name = name.substring(0, name.indexOf('{'));
+      } else { 
+        attr = traits.getTrait(props.name).attribute;
+      }
     }
     return (
         <div className='trait'>
-          <span>{props.name} ({attr})</span>
+          <span>{name + " (" + attr + ")"}</span>
         </div>
       );
 }

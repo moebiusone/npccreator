@@ -12,7 +12,7 @@ class Traits {
         this.traits.push(this.createTrait('Astronomy', 'Education'));
         this.traits.push(this.createTrait('Astrophysics', 'Education', ['Astronomy']));
         this.traits.push(this.createTrait('Atmospherics', 'Education'));
-        this.traits.push(this.createTrait('Back to School', 'Special', ['Education']));
+        this.traits.push(this.createTrait('Back to School', 'Special', [], ['Education']));
         this.traits.push(this.createTrait('Bandages', 'Accuracy'));
         this.traits.push(this.createTrait('Behavior Prediction', 'Education'));
         this.traits.push(this.createTrait('Biology', 'Education'));
@@ -71,6 +71,14 @@ class Traits {
 
         this.special = [];
         this.special.push('Rich');
+
+        this.canRepeatTraits = [];
+        this.canRepeatTraits.push("Armorer: Specialization");
+        this.canRepeatTraits.push("Cybernetic Enhancement");
+        this.canRepeatTraits.push("Genetic Enhancement");
+        this.canRepeatTraits.push("Guns: Specialization");
+        this.canRepeatTraits.push("Melee: Specialization");
+
     }
 
     createTrait(name, attribute, prerequisites = [], attributesToMod = [], allPrereqs = true ) {

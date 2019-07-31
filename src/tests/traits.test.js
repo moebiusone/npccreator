@@ -18,5 +18,20 @@ describe('Traits tests', function() {
       console.log(`missing Biology or Xenobiology, prereq for Necropsy = ${missingBiologyOrXenoBiology}`);
       assert.equal(missingBiologyOrXenoBiology, false);
     });
+
+    it('should return one or more attributes to modify for certain traits', async function(){
+      let back2school = await traits.getTrait('Back to School');
+      assert.equal(back2school.attributesToMod, 'Education');
+
+      let hittingTheGym = await traits.getTrait('Hitting the Gym');
+      assert.equal(hittingTheGym.attributesToMod, 'Toughness');
+
+      let cyberEnhancement = await traits.getTrait('Cybernetic Enhancement');
+      assert.equal(cyberEnhancement.attributesToMod.length > 1, true);
+
+      let geneticEnhancement = await traits.getTrait('Genetic Enhancement');
+      assert.equal(geneticEnhancement.attributesToMod.length > 1, true);
+
+    });
   });
 });
